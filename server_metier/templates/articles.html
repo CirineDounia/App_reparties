@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse Articles - Innov3D</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #1abc9c;
+            --sidebar-bg: #1a252f;
+            --sidebar-hover: #283642;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: var(--sidebar-bg);
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+        }
+
+        .sidebar-brand {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .sidebar-menu-item {
+            padding: 0.75rem 1.5rem;
+            color: #b8c5d6;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu-item:hover {
+            background: var(--sidebar-hover);
+            color: white;
+            border-left-color: var(--accent-color);
+        }
+
+        .sidebar-menu-item.active {
+            background: var(--sidebar-hover);
+            color: white;
+            border-left-color: var(--accent-color);
+        }
+
+        .logout-btn {
+            margin: 1rem;
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .logout-btn:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .top-navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .search-bar {
+            position: relative;
+            width: 350px;
+        }
+
+        .search-bar input {
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .dashboard-content {
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        /* KPI Principal Card */
+        .kpi-principal-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            color: white;
+            box-shadow: 0 8px 24px rgba(240, 147, 251, 0.35);
+            margin-bottom: 2rem;
+        }
+
+        .kpi-principal-card h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .kpi-principal-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .kpi-principal-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1.25rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .kpi-principal-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-principal-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .stats-card.blue::before { background: #3b82f6; }
+        .stats-card.green::before { background: #10b981; }
+        .stats-card.orange::before { background: #f59e0b; }
+        .stats-card.purple::before { background: #8b5cf6; }
+        .stats-card.red::before { background: #ef4444; }
+
+        .stats-card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            color: #6b7280;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .stats-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stats-card.blue .stats-icon-wrapper { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .stats-card.green .stats-icon-wrapper { background: linear-gradient(135deg, #10b981, #059669); }
+        .stats-card.orange .stats-icon-wrapper { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .stats-card.purple .stats-icon-wrapper { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .stats-card.red .stats-icon-wrapper { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+        /* Charts */
+        .charts-section {
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .chart-card h6 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1.25rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Alert Section */
+        .alert-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+            margin-top: 1.5rem;
+        }
+
+        .alert-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .article-card {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .quality-card {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <a href="/dashboard?nom={{ user.nom }}&service={{ user.service }}&role={{ user.role }}" class="sidebar-brand">
+            <i class="bi bi-hexagon-fill"></i>
+            <span>Innov3D - USA</span>
+        </a>
+    </div>
+
+    <nav class="sidebar-menu">
+        <a href="/dashboard?nom={{ user.nom }}&service={{ user.service }}&role={{ user.role }}" class="sidebar-menu-item">
+            <i class="bi bi-speedometer2"></i>
+            <span>Tableau de bord</span>
+        </a>
+        <a href="/personnel/analyse?nom={{ user.nom }}&service={{ user.service }}&role={{ user.role }}" class="sidebar-menu-item">
+            <i class="bi bi-people"></i>
+            <span>Personnel</span>
+        </a>
+        <a href="/articles/analyse?nom={{ user.nom }}&service={{ user.service }}&role={{ user.role }}" class="sidebar-menu-item active">
+            <i class="bi bi-box-seam"></i>
+            <span>Articles</span>
+        </a>
+        <a href="/operations/analyse?nom={{ user.nom }}&service={{ user.service }}&role={{ user.role }}" class="sidebar-menu-item">
+            <i class="bi bi-bar-chart"></i>
+            <span>Opérations</span>
+        </a>
+        <a href="/surveillance/analyse?nom={{ user.nom }}&service={{ user.service }}&role={{ user.role }}" class="sidebar-menu-item">
+            <i class="bi bi-heart-pulse"></i>
+            <span>Surveillance</span>
+        </a>
+        <a href="/sanitaire/analyse?nom={{ user.nom }}&service={{ user.service }}&role={{ user.role }}" class="sidebar-menu-item">
+            <i class="bi bi-wind"></i>
+            <span>Sanitaire</span>
+        </a>
+        <a href="/" class="sidebar-menu-item logout-btn">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Déconnexion</span>
+        </a>
+    </nav>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+    <!-- TOP NAVBAR -->
+    <div class="top-navbar">
+        <div class="search-bar">
+            <i class="bi bi-search"></i>
+            <input type="text" class="form-control" placeholder="Rechercher...">
+        </div>
+
+        <div class="user-profile">
+            <div class="notification-icon">
+                <i class="bi bi-bell fs-5"></i>
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="user-avatar">
+                {{ user.nom[0] }}
+            </div>
+            <div>
+                <div class="fw-semibold" style="font-size: 0.9rem;">{{ user.nom }}</div>
+                <div class="text-muted" style="font-size: 0.8rem;">{{ user.service }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD CONTENT -->
+    <div class="dashboard-content">
+        
+        <!-- <div class="page-header">
+            <h1 class="page-title">📦 Analyse des Articles</h1>
+            <p class="page-subtitle">Suivi de la qualité et des collisions sur la chaîne de montage</p>
+        </div> -->
+
+        <!-- KPI PRINCIPAL DEMANDÉ -->
+        {% if overview.article_moins_collisions %}
+        <div class="kpi-principal-card">
+            <h4>
+                <i class="bi bi-trophy-fill"></i>
+                KPI Principal : Article avec le Moins de Collisions
+            </h4>
+            <div class="kpi-principal-content">
+                <div class="kpi-principal-item">
+                    <div class="kpi-principal-label">ID Article</div>
+                    <div class="kpi-principal-value">{{ overview.article_moins_collisions.id_article }}</div>
+                </div>
+                <div class="kpi-principal-item">
+                    <div class="kpi-principal-label">Zone</div>
+                    <div class="kpi-principal-value">{{ overview.article_moins_collisions.zone }}</div>
+                </div>
+                <div class="kpi-principal-item">
+                    <div class="kpi-principal-label">Collisions</div>
+                    <div class="kpi-principal-value">{{ overview.article_moins_collisions.collisions }}</div>
+                </div>
+                <div class="kpi-principal-item">
+                    <div class="kpi-principal-label">État Emballage</div>
+                    <div class="kpi-principal-value">{{ overview.article_moins_collisions.etat_emballage }}</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- KPIs SECONDAIRES -->
+        <div class="stats-grid">
+            <div class="stats-card blue">
+                <div class="stats-card-content">
+                    <div class="stats-info">
+                        <div class="stats-number">{{ overview.total_articles }}</div>
+                        <div class="stats-label">Articles total</div>
+                    </div>
+                    <div class="stats-icon-wrapper">
+                        <i class="bi bi-box"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card green">
+                <div class="stats-card-content">
+                    <div class="stats-info">
+                        <div class="stats-number">{{ overview.articles_conformes }}</div>
+                        <div class="stats-label">Articles conformes</div>
+                    </div>
+                    <div class="stats-icon-wrapper">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card orange">
+                <div class="stats-card-content">
+                    <div class="stats-info">
+                        <div class="stats-number">{{ overview.articles_deformes }}</div>
+                        <div class="stats-label">Articles déformés</div>
+                    </div>
+                    <div class="stats-icon-wrapper">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card red">
+                <div class="stats-card-content">
+                    <div class="stats-info">
+                        <div class="stats-number">{{ overview.total_collisions }}</div>
+                        <div class="stats-label">Total collisions</div>
+                    </div>
+                    <div class="stats-icon-wrapper">
+                        <i class="bi bi-exclamation-octagon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card purple">
+                <div class="stats-card-content">
+                    <div class="stats-info">
+                        <div class="stats-number">{{ overview.taux_conformite }}%</div>
+                        <div class="stats-label">Taux de conformité</div>
+                    </div>
+                    <div class="stats-icon-wrapper">
+                        <i class="bi bi-pie-chart"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card blue">
+                <div class="stats-card-content">
+                    <div class="stats-info">
+                        <div class="stats-number">{{ overview.articles_sans_collision }}</div>
+                        <div class="stats-label">Sans collision</div>
+                    </div>
+                    <div class="stats-icon-wrapper">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAPHIQUES -->
+        <div class="charts-section">
+            <!-- <h2 class="section-title">📊 Analyses Graphiques</h2> -->
+
+            <div class="charts-grid">
+                <!-- Graphique 1 -->
+                <div class="chart-card">
+                    <h6><i class="bi bi-pie-chart"></i> État des emballages</h6>
+                    <div class="chart-container">
+                        <canvas id="emballagesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Graphique 2 -->
+                <div class="chart-card">
+                    <h6><i class="bi bi-geo-alt"></i> Articles par zone</h6>
+                    <div class="chart-container">
+                        <canvas id="zonesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Graphique 3 -->
+                <div class="chart-card">
+                    <h6><i class="bi bi-exclamation-circle"></i> Collisions par zone</h6>
+                    <div class="chart-container">
+                        <canvas id="collisionsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Graphique 4 -->
+                <div class="chart-card">
+                    <h6><i class="bi bi-bar-chart"></i> État emballage par zone</h6>
+                    <div class="chart-container">
+                        <canvas id="emballageZoneChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Graphique 5 -->
+                <div class="chart-card">
+                    <h6><i class="bi bi-graph-up"></i> Distribution des collisions</h6>
+                    <div class="chart-container">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Graphique 6 -->
+                <div class="chart-card">
+                    <h6><i class="bi bi-people"></i> Top 10 responsables</h6>
+                    <div class="chart-container">
+                        <canvas id="responsablesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALERTES -->
+        <!-- {% if overview.articles_critiques %}
+        <div class="alert-section">
+            <div class="alert-title">
+                <i class="bi bi-exclamation-triangle text-danger"></i>
+                Articles critiques ({{ overview.articles_critiques|length }})
+            </div>
+            
+            {% for art in overview.articles_critiques %}
+            <div class="article-card">
+                <strong>Article {{ art.id_article }}</strong> - Zone {{ art.zone }} - 
+                <span class="text-danger">{{ art.collisions }} collision(s)</span> - 
+                Resp: {{ art.responsable_nom }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if overview.articles_qualite_probleme %}
+        <div class="alert-section">
+            <div class="alert-title">
+                <i class="bi bi-exclamation-circle text-warning"></i>
+                Problèmes de qualité - Déformés sans collision ({{ overview.articles_qualite_probleme|length }})
+            </div>
+            
+            {% for art in overview.articles_qualite_probleme %}
+            <div class="quality-card">
+                <strong>Article {{ art.id_article }}</strong> - Zone {{ art.zone }} - 
+                Emballage déformé sans impact physique
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}-->
+
+    </div>
+</div> 
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+    Chart.defaults.color = '#6b7280';
+
+    const colors = {
+        blue: '#3b82f6',
+        green: '#10b981',
+        orange: '#f59e0b',
+        purple: '#8b5cf6',
+        red: '#ef4444',
+        cyan: '#06b6d4'
+    };
+
+    // Graphique 1: État emballages
+    const emballagesData = {{ overview.graphique_emballages | tojson }};
+    new Chart(document.getElementById("emballagesChart"), {
+        type: "pie",
+        data: {
+            labels: emballagesData.map(d => d.etat),
+            datasets: [{
+                data: emballagesData.map(d => d.total),
+                backgroundColor: [colors.green, colors.orange]
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Graphique 2: Articles par zone
+    const zonesData = {{ overview.graphique_zones | tojson }};
+    new Chart(document.getElementById("zonesChart"), {
+        type: "bar",
+        data: {
+            labels: zonesData.map(d => d.zone),
+            datasets: [{
+                label: "Nombre d'articles",
+                data: zonesData.map(d => d.total),
+                backgroundColor: colors.blue,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Graphique 3: Collisions par zone
+    const collisionsData = {{ overview.graphique_collisions_zones | tojson }};
+    new Chart(document.getElementById("collisionsChart"), {
+        type: "line",
+        data: {
+            labels: collisionsData.map(d => d.zone),
+            datasets: [{
+                label: "Collisions",
+                data: collisionsData.map(d => d.collisions),
+                borderColor: colors.red,
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Graphique 4: Emballage par zone
+    const emballageZoneData = {{ overview.emballage_par_zone | tojson }};
+    new Chart(document.getElementById("emballageZoneChart"), {
+        type: "bar",
+        data: {
+            labels: emballageZoneData.zones,
+            datasets: [
+                {
+                    label: "Correct",
+                    data: emballageZoneData.correct,
+                    backgroundColor: colors.green
+                },
+                {
+                    label: "Déformé",
+                    data: emballageZoneData.deforme,
+                    backgroundColor: colors.orange
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { x: { stacked: true }, y: { stacked: true } }
+        }
+    });
+
+    // Graphique 5: Distribution collisions
+    const distributionData = {{ overview.graphique_distribution_collisions | tojson }};
+    new Chart(document.getElementById("distributionChart"), {
+        type: "bar",
+        data: {
+            labels: distributionData.map(d => d.collisions + " collision(s)"),
+            datasets: [{
+                label: "Nombre d'articles",
+                data: distributionData.map(d => d.nombre_articles),
+                backgroundColor: colors.purple,
+                borderRadius: 8
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Graphique 6: Top responsables
+    const responsablesData = {{ overview.top_responsables | tojson }};
+    new Chart(document.getElementById("responsablesChart"), {
+        type: "bar",
+        data: {
+            labels: responsablesData.map(d => d.nom),
+            datasets: [{
+                label: "Nombre d'articles",
+                data: responsablesData.map(d => d.total),
+                backgroundColor: colors.cyan,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y'
+        }
+    });
+</script>
+
+</body>
+</html>

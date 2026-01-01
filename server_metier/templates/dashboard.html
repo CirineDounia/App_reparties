@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard – Innov3D</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #1abc9c;
+            --sidebar-bg: #1a252f;
+            --sidebar-hover: #283642;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: var(--sidebar-bg);
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-brand i {
+            font-size: 1.6rem;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .sidebar-menu-item {
+            padding: 0.75rem 1.5rem;
+            color: #b8c5d6;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu-item:hover {
+            background: var(--sidebar-hover);
+            color: white;
+            border-left-color: var(--accent-color);
+        }
+
+        .sidebar-menu-item.active {
+            background: var(--sidebar-hover);
+            color: white;
+            border-left-color: var(--accent-color);
+        }
+
+        .sidebar-menu-item i {
+            font-size: 1.1rem;
+            width: 20px;
+        }
+
+        .logout-btn {
+            margin: 1rem;
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .logout-btn:hover {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .search-bar {
+            position: relative;
+            width: 350px;
+        }
+
+        .search-bar input {
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .notification-icon:hover {
+            background: #f3f4f6;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        /* Stats Cards - VERSION COMPACTE */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .stats-card.blue::before { background: #3b82f6; }
+        .stats-card.green::before { background: #10b981; }
+        .stats-card.orange::before { background: #f59e0b; }
+        .stats-card.purple::before { background: #8b5cf6; }
+
+        .stats-card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .stats-info {
+            flex: 1;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            color: #6b7280;
+            font-size: 0.85rem;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .stats-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .stats-card.blue .stats-icon-wrapper { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .stats-card.green .stats-icon-wrapper { background: linear-gradient(135deg, #10b981, #059669); }
+        .stats-card.orange .stats-icon-wrapper { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .stats-card.purple .stats-icon-wrapper { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+
+        /* Drone Card - NOUVELLE SECTION */
+        .drone-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            color: white;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .drone-card h5 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .drone-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .drone-stat-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .drone-stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .drone-stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .drone-stat-item.alert {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--secondary-color);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .chart-card h6 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-card h6 i {
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .search-bar {
+                width: 200px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .drone-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <a href="#" class="sidebar-brand">
+            <i class="bi bi-hexagon-fill"></i>
+            <span>Innov3D - USA</span>
+        </a>
+    </div>
+
+    <nav class="sidebar-menu">
+        <a href="#" class="sidebar-menu-item active">
+            <i class="bi bi-speedometer2"></i>
+            <span>Tableau de bord</span>
+        </a>
+        <a href="/personnel/analyse?nom={{ user.nom }}&service={{ user.service }}&role={{ user.role }}" 
+            class="sidebar-menu-item">
+                <i class="bi bi-people"></i>
+                <span>Personnel</span>
+        </a>
+        <a href="/articles
+        
+        /analyse?nom={{ user.nom }}&service={{ user.service }}&role={{ user.role }}" class="sidebar-menu-item">
+            <i class="bi bi-box-seam"></i>
+            <span>Articles</span>
+        </a>
+        <a href="/operations/analyse?nom={{ user.nom }}&service={{ user.service }}&role={{ user.role }}" class="sidebar-menu-item">
+            <i class="bi bi-bar-chart"></i>
+            <span>Opérations</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+            <i class="bi bi-heart-pulse"></i>
+            <span>Surveillance</span>
+        </a>
+        <a href="#" class="sidebar-menu-item">
+            <i class="bi bi-gear"></i>
+            <span>Paramètres</span>
+        </a>
+        <a href="/" class="sidebar-menu-item logout-btn">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Déconnexion</span>
+        </a>
+    </nav>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+    <!-- TOP NAVBAR -->
+    <div class="top-navbar">
+        <div class="search-bar">
+            <i class="bi bi-search"></i>
+            <input type="text" class="form-control" placeholder="Rechercher...">
+        </div>
+
+        <div class="user-profile">
+            <div class="notification-icon">
+                <i class="bi bi-bell fs-5"></i>
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="user-avatar">
+                {{ user.nom[0] }}
+            </div>
+            <div>
+                <div class="fw-semibold" style="font-size: 0.9rem;">{{ user.nom }}</div>
+                <div class="text-muted" style="font-size: 0.8rem;">{{ user.service }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD CONTENT -->
+    <div class="dashboard-content">
+        
+        <!-- PAGE HEADER -->
+        <!-- <div class="page-header">
+            <h1 class="page-title">Tableau de bord</h1>
+            <p class="page-subtitle">Vue d'ensemble des indicateurs clés de performance</p>
+        </div> -->
+
+        <!-- STATS CARDS - VERSION COMPACTE -->
+        <div class="stats-grid">
+            <div class="stats-card blue">
+                <div class="stats-card-content">
+                    <div class="stats-info">
+                        <div class="stats-number">{{ overview.resp_vente.total }}</div>
+                        <div class="stats-label">Responsables commerciaux</div>
+                    </div>
+                    <div class="stats-icon-wrapper">
+                        <i class="bi bi-people"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card green">
+                <div class="stats-card-content">
+                    <div class="stats-info">
+                        <div class="stats-number">{{ overview.maintenance.incendies_actifs }}</div>
+                        <div class="stats-label">Incendies en cours</div>
+                    </div>
+                    <div class="stats-icon-wrapper">
+                        <i class="bi bi-fire"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card orange">
+                <div class="stats-card-content">
+                    <div class="stats-info">
+                        <div class="stats-number">{{ overview.rd.articles_deformes_sans_collision }}</div>
+                        <div class="stats-label">Emballages déformés</div>
+                    </div>
+                    <div class="stats-icon-wrapper">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-card purple">
+                <div class="stats-card-content">
+                    <div class="stats-info">
+                        <div class="stats-number">{{ overview.qualite.articles_emballage_correct }}</div>
+                        <div class="stats-label">Articles conformes</div>
+                    </div>
+                    <div class="stats-icon-wrapper">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DRONE SECTION -->
+        <!-- {% if overview.drone_plus_ancien %}
+        <div class="drone-card">
+            <h5>
+                <i class="bi bi-robot"></i>
+                Surveillance Drone - Zone Critique
+            </h5>
+            <div class="drone-stats">
+                <div class="drone-stat-item">
+                    <div class="drone-stat-value">Zone {{ overview.drone_plus_ancien.zone }}</div>
+                    <div class="drone-stat-label">Zone surveillée</div>
+                </div>
+                <div class="drone-stat-item">
+                    <div class="drone-stat-value">{{ overview.drone_plus_ancien.drone_age }} ans</div>
+                    <div class="drone-stat-label">Âge du drone</div>
+                </div>
+                <div class="drone-stat-item alert">
+                    <div class="drone-stat-value">{{ overview.drone_plus_ancien.drones_panne }}</div>
+                    <div class="drone-stat-label">Drones en panne</div>
+                </div>
+                <div class="drone-stat-item">
+                    <div class="drone-stat-value">{{ overview.drone_plus_ancien.drones_rechargement }}</div>
+                    <div class="drone-stat-label">En rechargement</div>
+                </div>
+            </div>
+        </div>
+        {% endif %} -->
+
+        <!-- CHARTS SECTION -->
+        <div class="charts-section">
+            <!-- <h2 class="section-title">
+                <i class="bi bi-graph-up"></i>
+                Analyses et Graphiques
+            </h2> -->
+
+            <div class="charts-grid">
+                <!-- Chart 1: Personnel par service -->
+                <div class="chart-card">
+                    <h6>
+                        <i class="bi bi-people-fill"></i>
+                        Répartition du personnel par service
+                    </h6>
+                    <div class="chart-container">
+                        <canvas id="personnelServiceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Articles par emballage -->
+                <div class="chart-card">
+                    <h6>
+                        <i class="bi bi-box-seam"></i>
+                        État des emballages
+                    </h6>
+                    <div class="chart-container">
+                        <canvas id="articleChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 3: CO2 par zone -->
+                <div class="chart-card">
+                    <h6>
+                        <i class="bi bi-wind"></i>
+                        Niveaux de CO2 par zone
+                    </h6>
+                    <div class="chart-container">
+                        <canvas id="coChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 4: Incidents -->
+                <div class="chart-card">
+                    <h6>
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Incidents par type
+                    </h6>
+                    <div class="chart-container">
+                        <canvas id="incidentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if overview.formation_meilleure %}
+<div style="background: linear-gradient(135deg, #667eea, #764ba2); 
+            border-radius: 12px; 
+            padding: 1.5rem; 
+            color: white; 
+            margin: 2rem 0;
+            max-width: 600px;">
+    
+    <!-- Titre -->
+    <h4 style="margin: 0 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+        🇧🇷 Formation RH - Site Brésil
+    </h4>
+    
+    <!-- Contenu principal -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        
+        <!-- Nom formation -->
+        <div style="flex: 1; min-width: 200px;">
+            <div style="font-size: 0.85rem; opacity: 0.8;">Formation</div>
+            <div style="font-size: 1.2rem; font-weight: 600; margin-top: 0.25rem;">
+                {{ overview.formation_meilleure.nom_formation }}
+            </div>
+        </div>
+        
+        <!-- Pourcentage -->
+        <div style="text-align: center; 
+                    background: rgba(255,255,255,0.2); 
+                    padding: 1rem 1.5rem; 
+                    border-radius: 8px;">
+            <div style="font-size: 2rem; font-weight: 800;">
+                {{ overview.formation_meilleure.pourcentage_engagement }}%
+            </div>
+            <div style="font-size: 0.8rem; opacity: 0.9;">Motivation</div>
+        </div>
+        
+    </div>
+</div>
+{% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Configuration commune pour tous les graphiques
+Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+Chart.defaults.color = '#6b7280';
+
+// Palette de couleurs moderne
+const colors = {
+    blue: '#3b82f6',
+    green: '#10b981',
+    orange: '#f59e0b',
+    purple: '#8b5cf6',
+    red: '#ef4444',
+    cyan: '#06b6d4',
+    pink: '#ec4899',
+    indigo: '#6366f1'
+};
+
+// Chart 1: Personnel par service
+const personnelData = {{ overview.personnel_services | tojson }};
+
+new Chart(document.getElementById("personnelServiceChart"), {
+    type: "bar",
+    data: {
+        labels: personnelData.map(d => d.service),
+        datasets: [{
+            label: "Nombre d'employés",
+            data: personnelData.map(d => d.total),
+            backgroundColor: [
+                colors.blue,
+                colors.green,
+                colors.orange,
+                colors.purple,
+                colors.cyan
+            ],
+            borderRadius: 8,
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: '#f3f4f6'
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
+
+// Chart 2: Articles par emballage
+const articleData = {{ overview.articles_emballage | tojson }};
+
+new Chart(document.getElementById("articleChart"), {
+    type: "doughnut",
+    data: {
+        labels: articleData.map(a => a.emballage),
+        datasets: [{
+            data: articleData.map(a => a.total),
+            backgroundColor: [
+                colors.green,
+                colors.orange,
+                colors.red
+            ],
+            borderWidth: 0,
+            spacing: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 15,
+                    usePointStyle: true,
+                    font: {
+                        size: 12
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Chart 3: CO2 par zone
+const coData = {{ overview.co_zones | tojson }};
+
+new Chart(document.getElementById("coChart"), {
+    type: "line",
+    data: {
+        labels: coData.map(z => z.zone),
+        datasets: [{
+            label: "CO2 moyen",
+            data: coData.map(z => z.co2),
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderColor: colors.green,
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: colors.green,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: '#f3f4f6'
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
+
+// Chart 4: Incidents par type
+const incidentData = {{ overview.incidents_types | tojson }};
+
+new Chart(document.getElementById("incidentChart"), {
+    type: "bar",
+    data: {
+        labels: incidentData.labels,
+        datasets: [{
+            label: "Nombre d'incidents",
+            data: incidentData.values,
+            backgroundColor: [
+                colors.red,
+                colors.orange,
+                colors.purple
+            ],
+            borderRadius: 8,
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                beginAtZero: true,
+                grid: {
+                    color: '#f3f4f6'
+                }
+            },
+            y: {
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
+</script>
+
+</body>
+</html>
